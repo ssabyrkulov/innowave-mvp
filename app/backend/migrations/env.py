@@ -1,18 +1,23 @@
+# app/backend/migrations/env.py
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
 import os, sys
 
-# Добавляем пути для импорта
+# пути для импорта src/*
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
+from src.config import settings               # <-- ВАЖНО: тянем URL из env
 from src.common.database import Base
 from src.repositories.users import User
 from src.repositories.companies import Company
 
 config = context.config
 fileConfig(config.config_file_name)
+
+# Переопределяем URL из alembic.ini на тот, что из переменных окружения
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
 target_metadata = Base.metadata
 
